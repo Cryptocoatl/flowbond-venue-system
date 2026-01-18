@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001') + '/api';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -235,6 +235,240 @@ class ApiClient {
 
   async cancelPass(id: string) {
     const { data } = await this.client.post(`/rewards/cancel/${id}`);
+    return data;
+  }
+
+  // ==========================================
+  // Registration endpoints
+  // ==========================================
+
+  async registerVenue(venueData: {
+    name: string;
+    slug: string;
+    description?: string;
+    address?: string;
+    city?: string;
+    timezone?: string;
+  }) {
+    const { data } = await this.client.post('/registration/venue', venueData);
+    return data;
+  }
+
+  async registerEvent(eventData: {
+    name: string;
+    slug: string;
+    description?: string;
+    startDate: string;
+    endDate: string;
+    timezone?: string;
+  }) {
+    const { data } = await this.client.post('/registration/event', eventData);
+    return data;
+  }
+
+  async registerBrand(brandData: {
+    name: string;
+    slug: string;
+    description?: string;
+    website?: string;
+  }) {
+    const { data } = await this.client.post('/registration/brand', brandData);
+    return data;
+  }
+
+  async getMyRegistrations() {
+    const { data } = await this.client.get('/registration/my');
+    return data;
+  }
+
+  async getRegistration(id: string) {
+    const { data } = await this.client.get(`/registration/${id}`);
+    return data;
+  }
+
+  // ==========================================
+  // Admin endpoints
+  // ==========================================
+
+  async getPendingRegistrations() {
+    const { data } = await this.client.get('/admin/registrations');
+    return data;
+  }
+
+  async approveRegistration(id: string, reviewNotes?: string) {
+    const { data } = await this.client.post(`/admin/registrations/${id}/approve`, {
+      status: 'APPROVED',
+      reviewNotes,
+    });
+    return data;
+  }
+
+  async rejectRegistration(id: string, reviewNotes?: string) {
+    const { data } = await this.client.post(`/admin/registrations/${id}/reject`, {
+      status: 'REJECTED',
+      reviewNotes,
+    });
+    return data;
+  }
+
+  // ==========================================
+  // Management endpoints
+  // ==========================================
+
+  async getMyVenues() {
+    const { data } = await this.client.get('/manage/venues');
+    return data;
+  }
+
+  async getMyEvents() {
+    const { data } = await this.client.get('/manage/events');
+    return data;
+  }
+
+  async getMyBrands() {
+    const { data } = await this.client.get('/manage/brands');
+    return data;
+  }
+
+  async updateVenue(id: string, updates: Record<string, any>) {
+    const { data } = await this.client.put(`/manage/venues/${id}`, updates);
+    return data;
+  }
+
+  async updateEvent(id: string, updates: Record<string, any>) {
+    const { data } = await this.client.put(`/manage/events/${id}`, updates);
+    return data;
+  }
+
+  async updateBrand(id: string, updates: Record<string, any>) {
+    const { data } = await this.client.put(`/manage/brands/${id}`, updates);
+    return data;
+  }
+
+  // ==========================================
+  // Menu endpoints
+  // ==========================================
+
+  async getVenueMenu(venueId: string) {
+    const { data } = await this.client.get(`/manage/venues/${venueId}/menu/categories`);
+    return data;
+  }
+
+  async getPublicMenu(venueId: string) {
+    const { data } = await this.client.get(`/venues/${venueId}/menu`);
+    return data;
+  }
+
+  async createMenuCategory(venueId: string, categoryData: {
+    name: string;
+    description?: string;
+    displayOrder?: number;
+  }) {
+    const { data } = await this.client.post(`/manage/venues/${venueId}/menu/categories`, categoryData);
+    return data;
+  }
+
+  async updateMenuCategory(categoryId: string, updates: Record<string, any>) {
+    const { data } = await this.client.put(`/manage/menu/categories/${categoryId}`, updates);
+    return data;
+  }
+
+  async deleteMenuCategory(categoryId: string) {
+    const { data } = await this.client.delete(`/manage/menu/categories/${categoryId}`);
+    return data;
+  }
+
+  async createMenuItem(categoryId: string, itemData: {
+    name: string;
+    description?: string;
+    type: string;
+    price: number;
+    isAvailable?: boolean;
+  }) {
+    const { data } = await this.client.post(`/manage/menu/categories/${categoryId}/items`, itemData);
+    return data;
+  }
+
+  async updateMenuItem(itemId: string, updates: Record<string, any>) {
+    const { data } = await this.client.put(`/manage/menu/items/${itemId}`, updates);
+    return data;
+  }
+
+  async deleteMenuItem(itemId: string) {
+    const { data } = await this.client.delete(`/manage/menu/items/${itemId}`);
+    return data;
+  }
+
+  // ==========================================
+  // Order endpoints
+  // ==========================================
+
+  async createOrder(venueId: string) {
+    const { data } = await this.client.post('/orders', { venueId });
+    return data;
+  }
+
+  async getMyOrders() {
+    const { data } = await this.client.get('/orders/my');
+    return data;
+  }
+
+  async getOrder(id: string) {
+    const { data } = await this.client.get(`/orders/${id}`);
+    return data;
+  }
+
+  async addOrderItem(orderId: string, item: {
+    menuItemId: string;
+    quantity: number;
+    notes?: string;
+  }) {
+    const { data } = await this.client.post(`/orders/${orderId}/items`, item);
+    return data;
+  }
+
+  async removeOrderItem(orderId: string, itemId: string) {
+    const { data } = await this.client.delete(`/orders/${orderId}/items/${itemId}`);
+    return data;
+  }
+
+  async checkoutOrder(orderId: string) {
+    const { data } = await this.client.post(`/orders/${orderId}/checkout`);
+    return data;
+  }
+
+  async getVenueOrders(venueId: string) {
+    const { data } = await this.client.get(`/manage/venues/${venueId}/orders`);
+    return data;
+  }
+
+  async updateOrderStatus(orderId: string, status: string) {
+    const { data } = await this.client.put(`/manage/orders/${orderId}/status`, { status });
+    return data;
+  }
+
+  // ==========================================
+  // Upload endpoints
+  // ==========================================
+
+  async uploadFile(file: File, entityType?: string, entityId?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    let url = '/uploads';
+    const params = new URLSearchParams();
+    if (entityType) params.append('entityType', entityType);
+    if (entityId) params.append('entityId', entityId);
+    if (params.toString()) url += `?${params.toString()}`;
+
+    const { data } = await this.client.post(url, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data;
+  }
+
+  async deleteFile(fileId: string) {
+    const { data } = await this.client.delete(`/uploads/${fileId}`);
     return data;
   }
 }

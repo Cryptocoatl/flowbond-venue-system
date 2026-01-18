@@ -16,6 +16,11 @@ import { TasksModule } from './modules/tasks/tasks.module';
 import { RewardsModule } from './modules/rewards/rewards.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
+import { RegistrationModule } from './modules/registration/registration.module';
+import { ManageModule } from './modules/manage/manage.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 // Common
 import { PrismaModule } from './common/prisma/prisma.module';
@@ -51,6 +56,11 @@ import { I18nModule } from './common/i18n/i18n.module';
     RewardsModule,
     NotificationsModule,
     AnalyticsModule,
+    RolesModule,
+    UploadsModule,
+    RegistrationModule,
+    ManageModule,
+    PaymentsModule,
   ],
   providers: [
     {

@@ -95,8 +95,6 @@ async function main() {
         name: 'Topo Chico',
         slug: 'topo-chico',
         logo: 'https://example.com/logos/topo-chico.png',
-        primaryColor: '#00A19B',
-        secondaryColor: '#FFFFFF',
       },
     }),
     prisma.sponsor.create({
@@ -104,8 +102,6 @@ async function main() {
         name: 'Deep Eddy Vodka',
         slug: 'deep-eddy',
         logo: 'https://example.com/logos/deep-eddy.png',
-        primaryColor: '#E31837',
-        secondaryColor: '#FFFFFF',
       },
     }),
     prisma.sponsor.create({
@@ -113,8 +109,6 @@ async function main() {
         name: 'Austin Beerworks',
         slug: 'austin-beerworks',
         logo: 'https://example.com/logos/austin-beerworks.png',
-        primaryColor: '#F7941D',
-        secondaryColor: '#000000',
       },
     }),
   ]);
@@ -127,18 +121,25 @@ async function main() {
       name: 'DANZ Austin',
       slug: 'danz-austin',
       address: '123 Music Lane, Austin, TX 78701',
+      city: 'Austin',
       timezone: 'America/Chicago',
-      logo: 'https://example.com/logos/danz-austin.png',
-      primaryColor: '#6366F1',
-      secondaryColor: '#EC4899',
       staff: {
         connect: [{ id: adminUser.id }, { id: staffUser.id }],
       },
-      sponsors: {
-        connect: sponsors.map((s) => ({ id: s.id })),
-      },
     },
   });
+
+  // Create SponsorVenue relations
+  await Promise.all(
+    sponsors.map((s) =>
+      prisma.sponsorVenue.create({
+        data: {
+          sponsorId: s.id,
+          venueId: venue.id,
+        },
+      })
+    )
+  );
   console.log(`   Created venue: ${venue.name}`);
 
   // Create Zones
@@ -180,7 +181,7 @@ async function main() {
         code: generateQRCode(),
         zoneId: zones[0].id,
         sponsorId: sponsors[0].id,
-        label: 'Main Floor - Topo Chico Station',
+        name: 'Main Floor - Topo Chico Station',
       },
     }),
     prisma.qRPoint.create({
@@ -188,7 +189,7 @@ async function main() {
         code: generateQRCode(),
         zoneId: zones[0].id,
         sponsorId: sponsors[1].id,
-        label: 'Main Floor - Deep Eddy Bar',
+        name: 'Main Floor - Deep Eddy Bar',
       },
     }),
     // VIP Lounge QR points
@@ -197,7 +198,7 @@ async function main() {
         code: generateQRCode(),
         zoneId: zones[1].id,
         sponsorId: sponsors[2].id,
-        label: 'VIP - Austin Beerworks Tap',
+        name: 'VIP - Austin Beerworks Tap',
       },
     }),
     // Outdoor Patio QR points
@@ -206,7 +207,7 @@ async function main() {
         code: generateQRCode(),
         zoneId: zones[2].id,
         sponsorId: sponsors[0].id,
-        label: 'Patio - Topo Chico Cooler',
+        name: 'Patio - Topo Chico Cooler',
       },
     }),
     // Bar Area QR points
@@ -215,7 +216,7 @@ async function main() {
         code: generateQRCode(),
         zoneId: zones[3].id,
         sponsorId: sponsors[1].id,
-        label: 'Bar - Deep Eddy Featured',
+        name: 'Bar - Deep Eddy Featured',
       },
     }),
     prisma.qRPoint.create({
@@ -223,7 +224,7 @@ async function main() {
         code: generateQRCode(),
         zoneId: zones[3].id,
         sponsorId: sponsors[2].id,
-        label: 'Bar - Austin Beerworks Draft',
+        name: 'Bar - Austin Beerworks Draft',
       },
     }),
   ]);
@@ -240,7 +241,6 @@ async function main() {
       name: 'Topo Chico Explorer',
       description: 'Discover the refreshing taste of Topo Chico throughout the venue!',
       sponsorId: sponsors[0].id,
-      venueId: venue.id,
       startDate: now,
       endDate: thirtyDaysFromNow,
       maxCompletions: 500,
@@ -254,7 +254,6 @@ async function main() {
       name: 'Deep Eddy Discovery',
       description: 'Experience the smooth taste of Deep Eddy Vodka cocktails!',
       sponsorId: sponsors[1].id,
-      venueId: venue.id,
       startDate: now,
       endDate: thirtyDaysFromNow,
       maxCompletions: 300,
@@ -268,7 +267,6 @@ async function main() {
       name: 'Local Brews Journey',
       description: 'Support local and taste the best craft beers Austin has to offer!',
       sponsorId: sponsors[2].id,
-      venueId: venue.id,
       startDate: now,
       endDate: thirtyDaysFromNow,
       maxCompletions: 400,
@@ -458,7 +456,7 @@ async function main() {
 
   console.log('\n📱 QR Codes:');
   qrPoints.forEach((qr) => {
-    console.log(`   ${qr.label}: ${qr.code}`);
+    console.log(`   ${qr.name}: ${qr.code}`);
   });
 }
 

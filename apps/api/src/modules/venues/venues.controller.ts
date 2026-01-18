@@ -41,4 +41,12 @@ export class VenuesController {
   async getActiveQuests(@Param('id') id: string) {
     return this.venuesService.getActiveQuests(id);
   }
+
+  @Get(':id/menu')
+  @ApiOperation({ summary: 'Get public menu for a venue' })
+  @ApiResponse({ status: 200, description: 'Menu categories with items' })
+  @ApiResponse({ status: 404, description: 'Venue not found' })
+  async getPublicMenu(@Param('id') id: string) {
+    return this.venuesService.getPublicMenu(id);
+  }
 }

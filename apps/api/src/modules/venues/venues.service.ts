@@ -128,6 +128,27 @@ export class VenuesService {
     return venue.sponsors.flatMap((sv) => sv.sponsor.quests);
   }
 
+  async getPublicMenu(venueId: string) {
+    const venue = await this.prisma.venue.findUnique({
+      where: { id: venueId },
+    });
+
+    if (!venue) {
+      throw new NotFoundException('Venue not found');
+    }
+
+    return this.prisma.menuCategory.findMany({
+      where: { venueId },
+      include: {
+        items: {
+          where: { isAvailable: true },
+          orderBy: { displayOrder: 'asc' },
+        },
+      },
+      orderBy: { displayOrder: 'asc' },
+    });
+  }
+
   async create(data: {
     name: string;
     slug: string;

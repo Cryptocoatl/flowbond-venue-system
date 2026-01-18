@@ -11,6 +11,121 @@ datasource db {
 }
 
 // ===========================================
+// Enums
+// ===========================================
+
+enum EntityType {
+  VENUE
+  EVENT
+  BRAND
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum TaskType {
+  QR_SCAN
+  SURVEY
+  CHECKIN
+  SOCIAL_SHARE
+  CUSTOM
+}
+
+enum QuestStatus {
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+enum DrinkPassStatus {
+  ACTIVE
+  REDEEMED
+  EXPIRED
+  CANCELLED
+}
+
+enum NotificationType {
+  QUEST_AVAILABLE
+  TASK_REMINDER
+  QUEST_COMPLETED
+  DRINK_PASS_ISSUED
+  DRINK_PASS_EXPIRING
+  DRINK_PASS_REDEEMED
+  SYSTEM
+}
+
+enum MenuItemType {
+  DRINK
+  FOOD
+  MERCHANDISE
+  TICKET
+  SERVICE
+  OTHER
+}
+
+enum OrderStatus {
+  DRAFT
+  PENDING_PAYMENT
+  PAID
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum OrderItemSource {
+  PURCHASED
+  REDEEMED
+  COMPED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentProvider {
+  STRIPE
+  SQUARE
+  PAYPAL
+  CASH
+  COMP
+  PROMOTION
+  MERCADO_PAGO
+  BANK_TRANSFER
+  NFC
+  MOCK
+}
+
+enum ItemPassStatus {
+  ACTIVE
+  REDEEMED
+  EXPIRED
+  CANCELLED
+}
+
+enum Role {
+  SUPER_ADMIN
+  VENUE_OWNER
+  VENUE_MANAGER
+  VENUE_STAFF
+  EVENT_OWNER
+  EVENT_STAFF
+  BRAND_OWNER
+  BRAND_MANAGER
+  CUSTOMER
+}
+
+// ===========================================
 // User Management
 // ===========================================
 
@@ -27,13 +142,40 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  // Relations
+  // Legacy staff relation
+  staffAtVenue    Venue?          @relation("VenueStaff", fields: [staffVenueId], references: [id])
+  staffVenueId    String?
+
+  // Existing relations
   questProgress   QuestProgress[]
   taskCompletions TaskCompletion[]
   drinkPasses     DrinkPass[]
   notifications   Notification[]
-  staffAtVenue    Venue?          @relation("VenueStaff", fields: [staffVenueId], references: [id])
-  staffVenueId    String?
+
+  // New ownership relations
+  ownedVenues               Venue[]               @relation("VenueOwner")
+  ownedEvents               Event[]               @relation("EventOwner")
+  ownedBrands               Brand[]               @relation("BrandOwner")
+  entityRegistrations       EntityRegistration[]  @relation("EntityOwner")
+  reviewedEntities          EntityRegistration[]  @relation("EntityReviewer")
+
+  // Order relations
+  orders                    Order[]
+
+  // Item pass relations
+  itemPasses                ItemPass[]
+  redeemedPasses            ItemPass[]            @relation("ItemPassRedeemer")
+
+  // Promotion relations
+  promotionProgress         PromotionProgress[]
+  promotionTaskCompletions  PromotionTaskCompletion[]
+
+  // Role relations
+  roles                     UserRole[]            @relation("UserRoles")
+  grantedRoles              UserRole[]            @relation("RoleGranter")
+
+  // File upload relations
+  fileUploads               FileUpload[]
 
   @@index([email])
   @@index([phone])
@@ -41,28 +183,92 @@ model User {
 }
 
 // ===========================================
+// Role & Permission System
+// ===========================================
+
+model UserRole {
+  id          String      @id @default(cuid())
+  userId      String
+  role        Role
+  entityType  EntityType?
+  entityId    String?
+  grantedById String?
+  createdAt   DateTime    @default(now())
+  expiresAt   DateTime?
+
+  // Relations
+  user        User        @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy   User?       @relation("RoleGranter", fields: [grantedById], references: [id])
+
+  @@unique([userId, role, entityType, entityId])
+  @@index([userId])
+  @@map("user_roles")
+}
+
+// ===========================================
+// Entity Registration (Self-Registration)
+// ===========================================
+
+model EntityRegistration {
+  id            String         @id @default(cuid())
+  type          EntityType
+  status        ApprovalStatus @default(PENDING)
+  ownerId       String
+  name          String
+  slug          String         @unique
+  description   String?
+  submittedAt   DateTime       @default(now())
+  reviewedAt    DateTime?
+  reviewedById  String?
+  reviewNotes   String?
+  data          Json?
+
+  // Relations
+  owner         User           @relation("EntityOwner", fields: [ownerId], references: [id])
+  reviewedBy    User?          @relation("EntityReviewer", fields: [reviewedById], references: [id])
+
+  @@index([ownerId])
+  @@index([status])
+  @@map("entity_registrations")
+}
+
+// ===========================================
 // Venue Management
 // ===========================================
 
 model Venue {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
-  slug        String   @unique
+  slug        String         @unique
   description String?
   address     String?
   city        String?
-  timezone    String   @default("America/Chicago")
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  timezone    String         @default("America/Chicago")
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // New fields
+  ownerId       String?
+  logoUrl       String?
+  bannerUrl     String?
+  status        ApprovalStatus @default(APPROVED)
+  paymentConfig Json?          // Stores payment provider configurations
 
   // Relations
-  zones      Zone[]
-  sponsors   SponsorVenue[]
-  staff      User[]         @relation("VenueStaff")
-  drinkPasses DrinkPass[]
+  owner          User?           @relation("VenueOwner", fields: [ownerId], references: [id])
+  zones          Zone[]
+  sponsors       SponsorVenue[]
+  staff          User[]          @relation("VenueStaff")
+  drinkPasses    DrinkPass[]
+  events         EventVenue[]
+  brands         BrandVenue[]
+  menuCategories MenuCategory[]
+  orders         Order[]
+  itemPasses     ItemPass[]
 
   @@index([slug])
+  @@index([ownerId])
   @@map("venues")
 }
 
@@ -105,7 +311,98 @@ model QRPoint {
 }
 
 // ===========================================
-// Sponsor & Quest System
+// Event System (Standalone)
+// ===========================================
+
+model Event {
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  description   String?
+  logoUrl       String?
+  bannerUrl     String?
+  startDate     DateTime
+  endDate       DateTime
+  timezone      String         @default("America/Chicago")
+  ownerId       String
+  status        ApprovalStatus @default(PENDING)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  owner          User           @relation("EventOwner", fields: [ownerId], references: [id])
+  venues         EventVenue[]
+  menuCategories MenuCategory[]
+  orders         Order[]
+  itemPasses     ItemPass[]
+
+  @@index([slug])
+  @@index([ownerId])
+  @@map("events")
+}
+
+model EventVenue {
+  id        String   @id @default(cuid())
+  eventId   String
+  venueId   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  // Relations
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, venueId])
+  @@map("event_venues")
+}
+
+// ===========================================
+// Brand System (Extended Sponsor)
+// ===========================================
+
+model Brand {
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  description   String?
+  logoUrl       String?
+  bannerUrl     String?
+  website       String?
+  ownerId       String
+  status        ApprovalStatus @default(PENDING)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Relations
+  owner         User           @relation("BrandOwner", fields: [ownerId], references: [id])
+  venues        BrandVenue[]
+  promotions    Promotion[]
+  menuItems     MenuItem[]
+
+  @@index([slug])
+  @@index([ownerId])
+  @@map("brands")
+}
+
+model BrandVenue {
+  id        String   @id @default(cuid())
+  brandId   String
+  venueId   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  // Relations
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([brandId, venueId])
+  @@map("brand_venues")
+}
+
+// ===========================================
+// Legacy Sponsor & Quest System (Keep for backward compatibility)
 // ===========================================
 
 model Sponsor {
@@ -188,14 +485,6 @@ model Task {
   @@map("tasks")
 }
 
-enum TaskType {
-  QR_SCAN      // Scan a specific QR code
-  SURVEY       // Complete a survey/form
-  CHECKIN      // Check in at a location
-  SOCIAL_SHARE // Share on social media
-  CUSTOM       // Custom validation
-}
-
 model TaskCompletion {
   id          String   @id @default(cuid())
   taskId      String
@@ -219,7 +508,7 @@ model QuestProgress {
   status      QuestStatus   @default(IN_PROGRESS)
   startedAt   DateTime      @default(now())
   completedAt DateTime?
-  
+
   // Relations
   quest SponsorQuest @relation(fields: [questId], references: [id], onDelete: Cascade)
   user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -229,28 +518,179 @@ model QuestProgress {
   @@map("quest_progress")
 }
 
-enum QuestStatus {
-  IN_PROGRESS
-  COMPLETED
-  EXPIRED
+// ===========================================
+// Menu System
+// ===========================================
+
+model MenuCategory {
+  id           String    @id @default(cuid())
+  name         String
+  description  String?
+  displayOrder Int       @default(0)
+  imageUrl     String?
+  venueId      String?
+  eventId      String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations (polymorphic - either venue OR event)
+  venue        Venue?    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  event        Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  items        MenuItem[]
+
+  @@index([venueId])
+  @@index([eventId])
+  @@map("menu_categories")
+}
+
+model MenuItem {
+  id            String       @id @default(cuid())
+  categoryId    String
+  brandId       String?
+  name          String
+  description   String?
+  type          MenuItemType
+  price         Decimal      @db.Decimal(10, 2)
+  imageUrl      String?
+  sku           String?
+  displayOrder  Int          @default(0)
+  isAvailable   Boolean      @default(true)
+  isRedeemable  Boolean      @default(false)
+  metadata      Json?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  category         MenuCategory      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  brand            Brand?            @relation(fields: [brandId], references: [id])
+  orderItems       OrderItem[]
+  promotionRewards PromotionReward[]
+
+  @@index([categoryId])
+  @@index([brandId])
+  @@map("menu_items")
 }
 
 // ===========================================
-// Rewards & DrinkPass System
+// Promotion System (Unified Quests)
+// ===========================================
+
+model Promotion {
+  id              String    @id @default(cuid())
+  brandId         String
+  name            String
+  description     String?
+  imageUrl        String?
+  startDate       DateTime?
+  endDate         DateTime?
+  maxRedemptions  Int?
+  redemptionCount Int       @default(0)
+  isActive        Boolean   @default(true)
+  promotionType   String    @default("QUEST")
+  rules           Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  brand           Brand               @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  tasks           PromotionTask[]
+  rewards         PromotionReward[]
+  userProgress    PromotionProgress[]
+
+  @@index([brandId])
+  @@map("promotions")
+}
+
+model PromotionTask {
+  id          String    @id @default(cuid())
+  promotionId String
+  name        String
+  description String?
+  type        TaskType
+  config      Json?
+  order       Int       @default(0)
+  isRequired  Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  promotion   Promotion                   @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  completions PromotionTaskCompletion[]
+
+  @@index([promotionId])
+  @@map("promotion_tasks")
+}
+
+model PromotionTaskCompletion {
+  id          String   @id @default(cuid())
+  taskId      String
+  userId      String
+  data        Json?
+  completedAt DateTime @default(now())
+
+  // Relations
+  task        PromotionTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@index([userId])
+  @@map("promotion_task_completions")
+}
+
+model PromotionProgress {
+  id          String      @id @default(cuid())
+  promotionId String
+  userId      String
+  status      QuestStatus @default(IN_PROGRESS)
+  startedAt   DateTime    @default(now())
+  completedAt DateTime?
+
+  // Relations
+  promotion   Promotion   @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([promotionId, userId])
+  @@index([userId])
+  @@map("promotion_progress")
+}
+
+model PromotionReward {
+  id              String   @id @default(cuid())
+  promotionId     String
+  menuItemId      String?
+  rewardType      String
+  description     String
+  discountValue   Decimal? @db.Decimal(10, 2)
+  discountPercent Int?
+  validityHours   Int      @default(24)
+  createdAt       DateTime @default(now())
+
+  // Relations
+  promotion       Promotion  @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  menuItem        MenuItem?  @relation(fields: [menuItemId], references: [id])
+  itemPasses      ItemPass[]
+
+  @@index([promotionId])
+  @@map("promotion_rewards")
+}
+
+// ===========================================
+// Legacy Rewards & DrinkPass System
 // ===========================================
 
 model DrinkReward {
-  id          String   @id @default(cuid())
-  questId     String   @unique
-  sponsorId   String
-  name        String
-  description String?
-  drinkType   String?
-  maxRedemptions Int?
-  redemptionCount Int  @default(0)
-  validityHours  Int   @default(24)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  questId         String   @unique
+  sponsorId       String
+  name            String
+  description     String?
+  drinkType       String?
+  maxRedemptions  Int?
+  redemptionCount Int      @default(0)
+  validityHours   Int      @default(24)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
   quest       SponsorQuest @relation(fields: [questId], references: [id], onDelete: Cascade)
@@ -284,11 +724,138 @@ model DrinkPass {
   @@map("drink_passes")
 }
 
-enum DrinkPassStatus {
-  ACTIVE
-  REDEEMED
-  EXPIRED
-  CANCELLED
+// ===========================================
+// Order & Payment System
+// ===========================================
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String
+  venueId         String?
+  eventId         String?
+  status          OrderStatus @default(DRAFT)
+  subtotal        Decimal     @db.Decimal(10, 2) @default(0)
+  tax             Decimal     @db.Decimal(10, 2) @default(0)
+  discount        Decimal     @db.Decimal(10, 2) @default(0)
+  total           Decimal     @db.Decimal(10, 2) @default(0)
+  notes           String?
+  metadata        Json?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  completedAt     DateTime?
+
+  // Relations
+  user            User        @relation(fields: [userId], references: [id])
+  venue           Venue?      @relation(fields: [venueId], references: [id])
+  event           Event?      @relation(fields: [eventId], references: [id])
+  items           OrderItem[]
+  payments        Payment[]
+
+  @@index([userId])
+  @@index([venueId])
+  @@index([eventId])
+  @@index([orderNumber])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String          @id @default(cuid())
+  orderId     String
+  menuItemId  String
+  itemPassId  String?
+  quantity    Int             @default(1)
+  unitPrice   Decimal         @db.Decimal(10, 2)
+  totalPrice  Decimal         @db.Decimal(10, 2)
+  source      OrderItemSource @default(PURCHASED)
+  notes       String?
+  metadata    Json?
+  createdAt   DateTime        @default(now())
+
+  // Relations
+  order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem    MenuItem        @relation(fields: [menuItemId], references: [id])
+  itemPass    ItemPass?       @relation(fields: [itemPassId], references: [id])
+
+  @@index([orderId])
+  @@index([menuItemId])
+  @@map("order_items")
+}
+
+model Payment {
+  id                String          @id @default(cuid())
+  orderId           String
+  amount            Decimal         @db.Decimal(10, 2)
+  status            PaymentStatus   @default(PENDING)
+  provider          PaymentProvider
+  providerPaymentId String?
+  providerData      Json?
+  refundedAmount    Decimal?        @db.Decimal(10, 2)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  completedAt       DateTime?
+
+  // Relations
+  order             Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([providerPaymentId])
+  @@map("payments")
+}
+
+// ===========================================
+// Item Pass System (Generalized DrinkPass)
+// ===========================================
+
+model ItemPass {
+  id              String         @id @default(cuid())
+  code            String         @unique
+  userId          String
+  venueId         String?
+  eventId         String?
+  rewardId        String
+  status          ItemPassStatus @default(ACTIVE)
+  issuedAt        DateTime       @default(now())
+  expiresAt       DateTime
+  redeemedAt      DateTime?
+  redeemedById    String?
+
+  // Relations
+  user            User              @relation(fields: [userId], references: [id])
+  venue           Venue?            @relation(fields: [venueId], references: [id])
+  event           Event?            @relation(fields: [eventId], references: [id])
+  reward          PromotionReward   @relation(fields: [rewardId], references: [id])
+  redeemedBy      User?             @relation("ItemPassRedeemer", fields: [redeemedById], references: [id])
+  orderItems      OrderItem[]
+
+  @@index([code])
+  @@index([userId])
+  @@index([venueId])
+  @@map("item_passes")
+}
+
+// ===========================================
+// File Upload System
+// ===========================================
+
+model FileUpload {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  uploadedById String
+  entityType   String?
+  entityId     String?
+  createdAt    DateTime @default(now())
+
+  // Relations
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([uploadedById])
+  @@map("file_uploads")
 }
 
 // ===========================================
@@ -310,14 +877,4 @@ model Notification {
 
   @@index([userId])
   @@map("notifications")
-}
-
-enum NotificationType {
-  QUEST_AVAILABLE
-  TASK_REMINDER
-  QUEST_COMPLETED
-  DRINK_PASS_ISSUED
-  DRINK_PASS_EXPIRING
-  DRINK_PASS_REDEEMED
-  SYSTEM
 }
