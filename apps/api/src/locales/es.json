@@ -1,0 +1,107 @@
+{
+  "common": {
+    "welcome": "Bienvenido a FlowBond",
+    "error": "Ocurrió un error",
+    "success": "Éxito",
+    "loading": "Cargando...",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "submit": "Enviar",
+    "close": "Cerrar"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "register": "Registrarse",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginSuccess": "Sesión iniciada exitosamente",
+    "logoutSuccess": "Sesión cerrada exitosamente",
+    "registerSuccess": "Cuenta creada exitosamente",
+    "invalidCredentials": "Correo o contraseña inválidos",
+    "sessionExpired": "Tu sesión ha expirado. Por favor inicia sesión nuevamente."
+  },
+  "onboarding": {
+    "selectLanguage": "Selecciona Tu Idioma",
+    "languageHint": "Puedes cambiar esto más tarde en configuración",
+    "continue": "Continuar",
+    "welcome": "¡Bienvenido!",
+    "welcomeMessage": "Estás listo para explorar misiones y ganar recompensas."
+  },
+  "qr": {
+    "scan": "Escanear Código QR",
+    "scanHint": "Apunta tu cámara a un código QR para comenzar",
+    "scanning": "Escaneando...",
+    "invalidCode": "Código QR inválido",
+    "codeNotFound": "Código QR no encontrado",
+    "scanSuccess": "Código QR escaneado exitosamente"
+  },
+  "quest": {
+    "availableQuests": "Misiones Disponibles",
+    "noQuests": "No hay misiones disponibles en este momento",
+    "questDetails": "Detalles de la Misión",
+    "startQuest": "Iniciar Misión",
+    "continueQuest": "Continuar Misión",
+    "questStarted": "¡Misión iniciada!",
+    "questCompleted": "¡Misión completada! 🎉",
+    "progress": "Progreso",
+    "tasksCompleted": "{{completed}} de {{total}} tareas completadas",
+    "expiresIn": "Expira en {{time}}",
+    "sponsoredBy": "Patrocinado por {{sponsor}}"
+  },
+  "task": {
+    "completeTask": "Completar Tarea",
+    "taskCompleted": "¡Tarea completada!",
+    "taskFailed": "La tarea no pudo ser verificada",
+    "scanQR": "Escanea el código QR en la ubicación designada",
+    "completeSurvey": "Completa la encuesta",
+    "checkIn": "Regístrate en esta ubicación",
+    "shareOnSocial": "Comparte en redes sociales"
+  },
+  "reward": {
+    "yourRewards": "Tus Recompensas",
+    "noRewards": "Completa misiones para ganar recompensas",
+    "claimReward": "Reclamar Recompensa",
+    "rewardClaimed": "¡Recompensa reclamada!",
+    "drinkPass": "Pase de Bebida",
+    "validUntil": "Válido hasta {{date}}",
+    "showToStaff": "Muestra este pase al personal para canjearlo",
+    "redeemNow": "Canjear Ahora",
+    "redeemed": "Canjeado",
+    "expired": "Expirado",
+    "passCode": "Código de Pase: {{code}}"
+  },
+  "notification": {
+    "questAvailable": "¡Nueva misión disponible!",
+    "questAvailableBody": "{{sponsor}} tiene una nueva misión para ti en {{venue}}",
+    "taskReminder": "¡No olvides!",
+    "taskReminderBody": "Tienes tareas incompletas en {{quest}}",
+    "questCompleted": "¡Felicitaciones!",
+    "questCompletedBody": "Has completado {{quest}} y ganaste una recompensa!",
+    "drinkPassIssued": "¡Pase de Bebida Listo!",
+    "drinkPassIssuedBody": "Tu {{drink}} gratis te espera. Válido hasta {{expiry}}.",
+    "drinkPassExpiring": "Pase Por Expirar",
+    "drinkPassExpiringBody": "Tu pase de bebida expira en {{hours}} horas. ¡Canjéalo ahora!",
+    "drinkPassRedeemed": "¡Salud! 🍻",
+    "drinkPassRedeemedBody": "Tu pase de bebida ha sido canjeado. ¡Disfruta!"
+  },
+  "venue": {
+    "currentVenue": "Estás en {{venue}}",
+    "zone": "Zona: {{zone}}",
+    "availableAtVenue": "Disponible en este lugar"
+  },
+  "error": {
+    "networkError": "Error de red. Por favor verifica tu conexión.",
+    "serverError": "Error del servidor. Por favor intenta más tarde.",
+    "notFound": "No encontrado",
+    "unauthorized": "Por favor inicia sesión para continuar",
+    "forbidden": "No tienes permiso para hacer esto",
+    "validationError": "Por favor verifica tu entrada"
+  }
+}

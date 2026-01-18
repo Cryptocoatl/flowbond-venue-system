@@ -1,0 +1,107 @@
+{
+  "common": {
+    "welcome": "Bienvenue sur FlowBond",
+    "error": "Une erreur s'est produite",
+    "success": "Succès",
+    "loading": "Chargement...",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Soumettre",
+    "close": "Fermer"
+  },
+  "auth": {
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "register": "S'inscrire",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "loginSuccess": "Connexion réussie",
+    "logoutSuccess": "Déconnexion réussie",
+    "registerSuccess": "Compte créé avec succès",
+    "invalidCredentials": "E-mail ou mot de passe invalide",
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter."
+  },
+  "onboarding": {
+    "selectLanguage": "Sélectionnez Votre Langue",
+    "languageHint": "Vous pouvez modifier cela plus tard dans les paramètres",
+    "continue": "Continuer",
+    "welcome": "Bienvenue !",
+    "welcomeMessage": "Vous êtes prêt à explorer les quêtes et gagner des récompenses."
+  },
+  "qr": {
+    "scan": "Scanner le Code QR",
+    "scanHint": "Pointez votre caméra vers un code QR pour commencer",
+    "scanning": "Scan en cours...",
+    "invalidCode": "Code QR invalide",
+    "codeNotFound": "Code QR non trouvé",
+    "scanSuccess": "Code QR scanné avec succès"
+  },
+  "quest": {
+    "availableQuests": "Quêtes Disponibles",
+    "noQuests": "Aucune quête disponible pour le moment",
+    "questDetails": "Détails de la Quête",
+    "startQuest": "Commencer la Quête",
+    "continueQuest": "Continuer la Quête",
+    "questStarted": "Quête commencée !",
+    "questCompleted": "Quête terminée ! 🎉",
+    "progress": "Progression",
+    "tasksCompleted": "{{completed}} sur {{total}} tâches complétées",
+    "expiresIn": "Expire dans {{time}}",
+    "sponsoredBy": "Sponsorisé par {{sponsor}}"
+  },
+  "task": {
+    "completeTask": "Terminer la Tâche",
+    "taskCompleted": "Tâche terminée !",
+    "taskFailed": "La tâche n'a pas pu être vérifiée",
+    "scanQR": "Scannez le code QR à l'emplacement désigné",
+    "completeSurvey": "Complétez le sondage",
+    "checkIn": "Enregistrez-vous à cet emplacement",
+    "shareOnSocial": "Partagez sur les réseaux sociaux"
+  },
+  "reward": {
+    "yourRewards": "Vos Récompenses",
+    "noRewards": "Complétez des quêtes pour gagner des récompenses",
+    "claimReward": "Réclamer la Récompense",
+    "rewardClaimed": "Récompense réclamée !",
+    "drinkPass": "Pass Boisson",
+    "validUntil": "Valide jusqu'au {{date}}",
+    "showToStaff": "Montrez ce pass au personnel pour l'échanger",
+    "redeemNow": "Échanger Maintenant",
+    "redeemed": "Échangé",
+    "expired": "Expiré",
+    "passCode": "Code du Pass : {{code}}"
+  },
+  "notification": {
+    "questAvailable": "Nouvelle quête disponible !",
+    "questAvailableBody": "{{sponsor}} a une nouvelle quête pour vous à {{venue}}",
+    "taskReminder": "N'oubliez pas !",
+    "taskReminderBody": "Vous avez des tâches incomplètes dans {{quest}}",
+    "questCompleted": "Félicitations !",
+    "questCompletedBody": "Vous avez terminé {{quest}} et gagné une récompense !",
+    "drinkPassIssued": "Pass Boisson Prêt !",
+    "drinkPassIssuedBody": "Votre {{drink}} gratuit vous attend. Valide jusqu'au {{expiry}}.",
+    "drinkPassExpiring": "Pass Bientôt Expiré",
+    "drinkPassExpiringBody": "Votre pass boisson expire dans {{hours}} heures. Échangez-le maintenant !",
+    "drinkPassRedeemed": "Santé ! 🍻",
+    "drinkPassRedeemedBody": "Votre pass boisson a été échangé. Profitez !"
+  },
+  "venue": {
+    "currentVenue": "Vous êtes à {{venue}}",
+    "zone": "Zone : {{zone}}",
+    "availableAtVenue": "Disponible dans ce lieu"
+  },
+  "error": {
+    "networkError": "Erreur réseau. Veuillez vérifier votre connexion.",
+    "serverError": "Erreur serveur. Veuillez réessayer plus tard.",
+    "notFound": "Non trouvé",
+    "unauthorized": "Veuillez vous connecter pour continuer",
+    "forbidden": "Vous n'avez pas la permission de faire cela",
+    "validationError": "Veuillez vérifier votre saisie"
+  }
+}

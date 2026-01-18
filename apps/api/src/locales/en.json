@@ -1,0 +1,107 @@
+{
+  "common": {
+    "welcome": "Welcome to FlowBond",
+    "error": "An error occurred",
+    "success": "Success",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "auth": {
+    "login": "Log In",
+    "logout": "Log Out",
+    "register": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "loginSuccess": "Successfully logged in",
+    "logoutSuccess": "Successfully logged out",
+    "registerSuccess": "Account created successfully",
+    "invalidCredentials": "Invalid email or password",
+    "sessionExpired": "Your session has expired. Please log in again."
+  },
+  "onboarding": {
+    "selectLanguage": "Select Your Language",
+    "languageHint": "You can change this later in settings",
+    "continue": "Continue",
+    "welcome": "Welcome!",
+    "welcomeMessage": "You're all set to start exploring quests and earning rewards."
+  },
+  "qr": {
+    "scan": "Scan QR Code",
+    "scanHint": "Point your camera at a QR code to get started",
+    "scanning": "Scanning...",
+    "invalidCode": "Invalid QR code",
+    "codeNotFound": "QR code not found",
+    "scanSuccess": "QR code scanned successfully"
+  },
+  "quest": {
+    "availableQuests": "Available Quests",
+    "noQuests": "No quests available at this time",
+    "questDetails": "Quest Details",
+    "startQuest": "Start Quest",
+    "continueQuest": "Continue Quest",
+    "questStarted": "Quest started!",
+    "questCompleted": "Quest completed! 🎉",
+    "progress": "Progress",
+    "tasksCompleted": "{{completed}} of {{total}} tasks completed",
+    "expiresIn": "Expires in {{time}}",
+    "sponsoredBy": "Sponsored by {{sponsor}}"
+  },
+  "task": {
+    "completeTask": "Complete Task",
+    "taskCompleted": "Task completed!",
+    "taskFailed": "Task could not be verified",
+    "scanQR": "Scan the QR code at the designated location",
+    "completeSurvey": "Complete the survey",
+    "checkIn": "Check in at this location",
+    "shareOnSocial": "Share on social media"
+  },
+  "reward": {
+    "yourRewards": "Your Rewards",
+    "noRewards": "Complete quests to earn rewards",
+    "claimReward": "Claim Reward",
+    "rewardClaimed": "Reward claimed!",
+    "drinkPass": "Drink Pass",
+    "validUntil": "Valid until {{date}}",
+    "showToStaff": "Show this pass to staff to redeem",
+    "redeemNow": "Redeem Now",
+    "redeemed": "Redeemed",
+    "expired": "Expired",
+    "passCode": "Pass Code: {{code}}"
+  },
+  "notification": {
+    "questAvailable": "New quest available!",
+    "questAvailableBody": "{{sponsor}} has a new quest for you at {{venue}}",
+    "taskReminder": "Don't forget!",
+    "taskReminderBody": "You have incomplete tasks in {{quest}}",
+    "questCompleted": "Congratulations!",
+    "questCompletedBody": "You've completed {{quest}} and earned a reward!",
+    "drinkPassIssued": "Drink Pass Ready!",
+    "drinkPassIssuedBody": "Your free {{drink}} is waiting. Valid until {{expiry}}.",
+    "drinkPassExpiring": "Pass Expiring Soon",
+    "drinkPassExpiringBody": "Your drink pass expires in {{hours}} hours. Redeem it now!",
+    "drinkPassRedeemed": "Cheers! 🍻",
+    "drinkPassRedeemedBody": "Your drink pass has been redeemed. Enjoy!"
+  },
+  "venue": {
+    "currentVenue": "You're at {{venue}}",
+    "zone": "Zone: {{zone}}",
+    "availableAtVenue": "Available at this venue"
+  },
+  "error": {
+    "networkError": "Network error. Please check your connection.",
+    "serverError": "Server error. Please try again later.",
+    "notFound": "Not found",
+    "unauthorized": "Please log in to continue",
+    "forbidden": "You don't have permission to do this",
+    "validationError": "Please check your input"
+  }
+}

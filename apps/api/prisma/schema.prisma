@@ -1,0 +1,323 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================
+// User Management
+// ===========================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  phone         String?   @unique
+  passwordHash  String?
+  name          String?
+  language      String    @default("en")
+  isGuest       Boolean   @default(true)
+  isStaff       Boolean   @default(false)
+  isAdmin       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  questProgress   QuestProgress[]
+  taskCompletions TaskCompletion[]
+  drinkPasses     DrinkPass[]
+  notifications   Notification[]
+  staffAtVenue    Venue?          @relation("VenueStaff", fields: [staffVenueId], references: [id])
+  staffVenueId    String?
+
+  @@index([email])
+  @@index([phone])
+  @@map("users")
+}
+
+// ===========================================
+// Venue Management
+// ===========================================
+
+model Venue {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  address     String?
+  city        String?
+  timezone    String   @default("America/Chicago")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  zones      Zone[]
+  sponsors   SponsorVenue[]
+  staff      User[]         @relation("VenueStaff")
+  drinkPasses DrinkPass[]
+
+  @@index([slug])
+  @@map("venues")
+}
+
+model Zone {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  venueId     String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  venue    Venue     @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  qrPoints QRPoint[]
+
+  @@index([venueId])
+  @@map("zones")
+}
+
+model QRPoint {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String?
+  description String?
+  zoneId      String
+  sponsorId   String?
+  isActive    Boolean  @default(true)
+  scanCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  zone    Zone     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  sponsor Sponsor? @relation(fields: [sponsorId], references: [id])
+
+  @@index([code])
+  @@index([zoneId])
+  @@map("qr_points")
+}
+
+// ===========================================
+// Sponsor & Quest System
+// ===========================================
+
+model Sponsor {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  logo        String?
+  description String?
+  website     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  venues       SponsorVenue[]
+  quests       SponsorQuest[]
+  qrPoints     QRPoint[]
+  drinkRewards DrinkReward[]
+
+  @@index([slug])
+  @@map("sponsors")
+}
+
+model SponsorVenue {
+  id        String   @id @default(cuid())
+  sponsorId String
+  venueId   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  // Relations
+  sponsor Sponsor @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  venue   Venue   @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([sponsorId, venueId])
+  @@map("sponsor_venues")
+}
+
+model SponsorQuest {
+  id              String    @id @default(cuid())
+  sponsorId       String
+  name            String
+  description     String?
+  imageUrl        String?
+  startDate       DateTime?
+  endDate         DateTime?
+  maxCompletions  Int?
+  completionCount Int       @default(0)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  sponsor       Sponsor         @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  tasks         Task[]
+  drinkReward   DrinkReward?
+  questProgress QuestProgress[]
+
+  @@index([sponsorId])
+  @@map("sponsor_quests")
+}
+
+model Task {
+  id                String   @id @default(cuid())
+  questId           String
+  name              String
+  description       String?
+  type              TaskType
+  validationConfig  Json?
+  order             Int      @default(0)
+  isRequired        Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  quest       SponsorQuest     @relation(fields: [questId], references: [id], onDelete: Cascade)
+  completions TaskCompletion[]
+
+  @@index([questId])
+  @@map("tasks")
+}
+
+enum TaskType {
+  QR_SCAN      // Scan a specific QR code
+  SURVEY       // Complete a survey/form
+  CHECKIN      // Check in at a location
+  SOCIAL_SHARE // Share on social media
+  CUSTOM       // Custom validation
+}
+
+model TaskCompletion {
+  id          String   @id @default(cuid())
+  taskId      String
+  userId      String
+  data        Json?
+  completedAt DateTime @default(now())
+
+  // Relations
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+  @@index([userId])
+  @@map("task_completions")
+}
+
+model QuestProgress {
+  id          String        @id @default(cuid())
+  questId     String
+  userId      String
+  status      QuestStatus   @default(IN_PROGRESS)
+  startedAt   DateTime      @default(now())
+  completedAt DateTime?
+  
+  // Relations
+  quest SponsorQuest @relation(fields: [questId], references: [id], onDelete: Cascade)
+  user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([questId, userId])
+  @@index([userId])
+  @@map("quest_progress")
+}
+
+enum QuestStatus {
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+// ===========================================
+// Rewards & DrinkPass System
+// ===========================================
+
+model DrinkReward {
+  id          String   @id @default(cuid())
+  questId     String   @unique
+  sponsorId   String
+  name        String
+  description String?
+  drinkType   String?
+  maxRedemptions Int?
+  redemptionCount Int  @default(0)
+  validityHours  Int   @default(24)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  quest       SponsorQuest @relation(fields: [questId], references: [id], onDelete: Cascade)
+  sponsor     Sponsor      @relation(fields: [sponsorId], references: [id])
+  drinkPasses DrinkPass[]
+
+  @@index([sponsorId])
+  @@map("drink_rewards")
+}
+
+model DrinkPass {
+  id            String          @id @default(cuid())
+  code          String          @unique
+  rewardId      String
+  userId        String
+  venueId       String
+  status        DrinkPassStatus @default(ACTIVE)
+  issuedAt      DateTime        @default(now())
+  expiresAt     DateTime
+  redeemedAt    DateTime?
+  redeemedBy    String?
+
+  // Relations
+  reward DrinkReward @relation(fields: [rewardId], references: [id])
+  user   User        @relation(fields: [userId], references: [id])
+  venue  Venue       @relation(fields: [venueId], references: [id])
+
+  @@index([code])
+  @@index([userId])
+  @@index([venueId])
+  @@map("drink_passes")
+}
+
+enum DrinkPassStatus {
+  ACTIVE
+  REDEEMED
+  EXPIRED
+  CANCELLED
+}
+
+// ===========================================
+// Notifications
+// ===========================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  titleKey  String
+  bodyKey   String
+  data      Json?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  QUEST_AVAILABLE
+  TASK_REMINDER
+  QUEST_COMPLETED
+  DRINK_PASS_ISSUED
+  DRINK_PASS_EXPIRING
+  DRINK_PASS_REDEEMED
+  SYSTEM
+}
