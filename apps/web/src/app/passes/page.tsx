@@ -45,8 +45,8 @@ export default function PassesPage() {
   const loadPasses = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/rewards/passes');
-      setPasses(response.data);
+      const passes = await api.getMyPasses();
+      setPasses(passes);
     } catch (err) {
       console.error('Failed to load passes:', err);
     } finally {
