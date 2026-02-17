@@ -154,6 +154,9 @@ export function useRequireAuth() {
 export function useRequireStaff() {
   const { user, isAuthenticated, isLoading } = useAuthStore();
   const isStaff = user?.isStaff || user?.isAdmin;
-  
+
   return { isStaff: !!isStaff, isAuthenticated, isLoading };
 }
+
+// Alias for backward compatibility
+export const useAuth = useAuthStore;

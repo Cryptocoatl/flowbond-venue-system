@@ -64,3 +64,6 @@ qr-codes/
 
 # Turbo
 .turbo/
+
+# Local Netlify folder
+.netlify
