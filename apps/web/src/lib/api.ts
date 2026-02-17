@@ -115,6 +115,21 @@ class ApiClient {
     return data;
   }
 
+  async put<T>(url: string, body?: any): Promise<T> {
+    const { data } = await this.client.put<T>(url, body);
+    return data;
+  }
+
+  async delete<T>(url: string): Promise<T> {
+    const { data } = await this.client.delete<T>(url);
+    return data;
+  }
+
+  async patch<T>(url: string, body?: any): Promise<T> {
+    const { data } = await this.client.patch<T>(url, body);
+    return data;
+  }
+
   // Auth endpoints
   async register(email: string, password: string, language: string = 'en') {
     const { data } = await this.client.post('/auth/register', { email, password, language });
