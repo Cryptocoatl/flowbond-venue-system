@@ -10,7 +10,7 @@ type AuthMode = 'login' | 'register' | 'guest';
 export default function AuthPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, login, register, createGuest, isAuthenticated } = useAuth();
+  const { user, login, register, loginAsGuest, isAuthenticated } = useAuth();
   const { t } = useTranslation(user?.language || 'en');
   
   const redirect = searchParams.get('redirect') || '/';
@@ -58,7 +58,7 @@ export default function AuthPage() {
     setLoading(true);
 
     try {
-      await createGuest(language);
+      await loginAsGuest(language);
       router.push(redirect);
     } catch (err: any) {
       setError(err.response?.data?.message || t('auth.errors.generic'));
