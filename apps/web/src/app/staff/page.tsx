@@ -62,8 +62,8 @@ export default function StaffPage() {
 
     try {
       const cleanCode = code.replace(/\s/g, '').toUpperCase();
-      const response = await api.get(`/rewards/verify/${cleanCode}`);
-      setVerifyResult(response.data);
+      const result = await api.verifyPass(cleanCode);
+      setVerifyResult(result);
     } catch (err: any) {
       if (err.response?.status === 404) {
         setError(t('staff.code_not_found'));
@@ -82,7 +82,7 @@ export default function StaffPage() {
     setError('');
 
     try {
-      await api.post(`/rewards/redeem/${verifyResult.drinkPass.id}`);
+      await api.redeemPass(verifyResult.drinkPass.id);
       setSuccess(t('staff.redeem_success'));
       setRecentRedemptions(prev => [{
         code: verifyResult.drinkPass!.code,

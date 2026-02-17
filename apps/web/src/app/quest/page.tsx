@@ -66,14 +66,14 @@ export default function QuestPage() {
   const loadQuestData = async () => {
     try {
       setLoading(true);
-      const [questRes, progressRes] = await Promise.all([
-        api.get(`/tasks/quest/${questId}`),
-        isAuthenticated ? api.get(`/tasks/quest/${questId}/progress`) : Promise.resolve(null),
+      const [questData, progressData] = await Promise.all([
+        api.get<Quest>(`/tasks/quest/${questId}`),
+        isAuthenticated ? api.get<Progress>(`/tasks/quest/${questId}/progress`) : Promise.resolve(null),
       ]);
-      
-      setQuest(questRes.data);
-      if (progressRes) {
-        setProgress(progressRes.data);
+
+      setQuest(questData);
+      if (progressData) {
+        setProgress(progressData);
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load quest');
@@ -90,9 +90,9 @@ export default function QuestPage() {
 
     try {
       setCompleting(task.id);
-      const response = await api.post(`/tasks/${task.id}/complete`, data);
-      
-      if (response.data.questCompleted) {
+      const result = await api.post<{ questCompleted: boolean }>(`/tasks/${task.id}/complete`, data);
+
+      if (result.questCompleted) {
         router.push(`/redeem?questId=${questId}`);
       } else {
         await loadQuestData();

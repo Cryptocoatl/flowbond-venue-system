@@ -58,8 +58,8 @@ export default function RedeemPage() {
   const loadExistingPass = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/rewards/passes/${passId}`);
-      setDrinkPass(response.data);
+      const passData = await api.getPass(passId as string);
+      setDrinkPass(passData);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load drink pass');
     } finally {
@@ -75,12 +75,8 @@ export default function RedeemPage() {
       // Get venue from localStorage or use default
       const venueId = localStorage.getItem('currentVenueId');
       
-      const response = await api.post('/rewards/claim', {
-        questId,
-        venueId,
-      });
-      
-      setDrinkPass(response.data.drinkPass);
+      const result = await api.claimReward(questId as string, venueId as string);
+      setDrinkPass(result.drinkPass);
     } catch (err: any) {
       if (err.response?.status === 409) {
         // Already claimed - redirect to passes
@@ -98,7 +94,7 @@ export default function RedeemPage() {
     if (!drinkPass || !confirm(t('rewards.cancel_confirm'))) return;
     
     try {
-      await api.post(`/rewards/cancel/${drinkPass.id}`);
+      await api.cancelPass(drinkPass.id);
       router.push('/passes');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to cancel pass');
