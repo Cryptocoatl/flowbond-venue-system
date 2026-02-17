@@ -68,7 +68,7 @@ export default function QuestPage() {
       setLoading(true);
       const [questData, progressData] = await Promise.all([
         api.get<Quest>(`/tasks/quest/${questId}`),
-        isAuthenticated ? api.get<Progress>(`/tasks/quest/${questId}/progress`) : Promise.resolve(null),
+        isAuthenticated ? api.get<QuestProgress>(`/tasks/quest/${questId}/progress`) : Promise.resolve(null),
       ]);
 
       setQuest(questData);
