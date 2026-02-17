@@ -104,6 +104,17 @@ class ApiClient {
     return !!this.accessToken;
   }
 
+  // Generic HTTP methods
+  async get<T>(url: string): Promise<T> {
+    const { data } = await this.client.get<T>(url);
+    return data;
+  }
+
+  async post<T>(url: string, body?: any): Promise<T> {
+    const { data } = await this.client.post<T>(url, body);
+    return data;
+  }
+
   // Auth endpoints
   async register(email: string, password: string, language: string = 'en') {
     const { data } = await this.client.post('/auth/register', { email, password, language });
