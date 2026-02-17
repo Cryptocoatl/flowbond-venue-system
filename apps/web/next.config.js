@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
+  transpilePackages: [],
   images: {
     unoptimized: true,
     remotePatterns: [
