@@ -29,7 +29,7 @@ interface VerifyResult {
 export default function StaffPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
-  const { t } = useTranslation(user?.language || 'en');
+  const { t } = useTranslation();
   
   const [code, setCode] = useState('');
   const [verifyResult, setVerifyResult] = useState<VerifyResult | null>(null);

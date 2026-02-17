@@ -29,7 +29,7 @@ export default function RedeemPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
-  const { t } = useTranslation(user?.language || 'en');
+  const { t } = useTranslation();
   
   const questId = searchParams.get('questId');
   const passId = searchParams.get('passId');

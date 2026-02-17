@@ -11,7 +11,7 @@ export default function AuthPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user, login, register, loginAsGuest, isAuthenticated } = useAuth();
-  const { t } = useTranslation(user?.language || 'en');
+  const { t } = useTranslation();
   
   const redirect = searchParams.get('redirect') || '/';
   

@@ -28,7 +28,7 @@ interface DrinkPass {
 export default function PassesPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
-  const { t } = useTranslation(user?.language || 'en');
+  const { t } = useTranslation();
   
   const [passes, setPasses] = useState<DrinkPass[]>([]);
   const [loading, setLoading] = useState(true);
